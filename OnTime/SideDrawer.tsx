@@ -1,36 +1,37 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React from 'react';
+import React from 'react'
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
   DrawerItemList,
-  DrawerContentComponentProps,
-} from '@react-navigation/drawer';
-import {StyleSheet, useWindowDimensions, View} from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+  type DrawerContentComponentProps
+} from '@react-navigation/drawer'
+import { StyleSheet, useWindowDimensions, View } from 'react-native'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 
-import DashboardScreen from './screens/DashboardScreen.tsx';
-import SettingsScreen from './screens/SettingsScreen.tsx';
-import ProfileScreen from './screens/ProfileScreen.tsx';
-import ApprovalScreen from './screens/ApprovalScreen.tsx';
-import TimesheetsScreen from './screens/TimesheetsScreen.tsx';
-import {lightTheme, darkTheme, useTheme} from './theme/Colors.tsx';
+import DashboardScreen from './screens/DashboardScreen.tsx'
+import SettingsScreen from './screens/SettingsScreen.tsx'
+import ProfileScreen from './screens/ProfileScreen.tsx'
+import ApprovalScreen from './screens/ApprovalScreen.tsx'
+import TimesheetsScreen from './screens/TimesheetsScreen.tsx'
+import UserManagement from './screens/UserManagement.tsx'
+import { lightTheme, darkTheme, useTheme } from './theme/Colors.tsx'
 
 const styles = StyleSheet.create({
   mainContainer: {
     paddingTop: 0,
-    flex: 1,
-  },
-});
+    flex: 1
+  }
+})
 
 interface CustomDrawerContentProps extends DrawerContentComponentProps {
-  handleLogout: () => void;
+  handleLogout: () => void
 }
 
-function CustomDrawerContent(props: CustomDrawerContentProps) {
-  const {colors} = useTheme();
-  const {handleLogout} = props;
+function CustomDrawerContent (props: CustomDrawerContentProps) {
+  const { colors } = useTheme()
+  const { handleLogout } = props
 
   return (
     <View style={styles.mainContainer}>
@@ -41,7 +42,7 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
       <DrawerItem
         label="Logout"
         onPress={handleLogout}
-        labelStyle={{color: colors.primary}}
+        labelStyle={{ color: colors.primary }}
         icon={() => (
           <FontAwesomeIcon
             icon="arrow-right-from-bracket"
@@ -50,29 +51,29 @@ function CustomDrawerContent(props: CustomDrawerContentProps) {
         )}
       />
     </View>
-  );
+  )
 }
 
-const Drawer = createDrawerNavigator();
+const Drawer = createDrawerNavigator()
 
 interface SideDrawerProps {
-  isDarkMode: boolean;
-  toggleTheme: () => void;
-  handleLogout: () => void;
+  isDarkMode: boolean
+  toggleTheme: () => void
+  handleLogout: () => void
 }
 
-function SideDrawer({
+function SideDrawer ({
   isDarkMode,
   toggleTheme,
-  handleLogout,
+  handleLogout
 }: SideDrawerProps): React.ReactElement {
-  const dimensions = useWindowDimensions();
+  const dimensions = useWindowDimensions()
 
   const drawerStyles = {
     backgroundColor: isDarkMode
       ? darkTheme.colors.background
-      : lightTheme.colors.background,
-  };
+      : lightTheme.colors.background
+  }
 
   const screenStyles = {
     drawerActiveTintColor: isDarkMode
@@ -86,15 +87,15 @@ function SideDrawer({
       : lightTheme.colors.card,
     drawerInactiveBackgroundColor: isDarkMode
       ? darkTheme.colors.background
-      : lightTheme.colors.background,
-  };
+      : lightTheme.colors.background
+  }
 
   return (
     <Drawer.Navigator
       screenOptions={{
         drawerType: dimensions.width >= 768 ? 'permanent' : 'front',
         drawerStyle: drawerStyles,
-        ...screenStyles,
+        ...screenStyles
       }}
       drawerContent={props => (
         <CustomDrawerContent {...props} handleLogout={handleLogout} />
@@ -103,26 +104,26 @@ function SideDrawer({
         name="Dashboard"
         component={DashboardScreen}
         options={{
-          drawerIcon: ({color}) => (
+          drawerIcon: ({ color }) => (
             <FontAwesomeIcon icon="house" color={color} />
-          ),
+          )
         }}
       />
       <Drawer.Screen
         name="Timesheets"
         component={TimesheetsScreen}
         options={{
-          drawerIcon: ({color}) => (
+          drawerIcon: ({ color }) => (
             <FontAwesomeIcon icon="clock" color={color} />
-          ),
+          )
         }}
       />
       <Drawer.Screen
         name="Profile"
         options={{
-          drawerIcon: ({color}) => (
+          drawerIcon: ({ color }) => (
             <FontAwesomeIcon icon="user" color={color} />
-          ),
+          )
         }}>
         {() => (
           <ProfileScreen />
@@ -131,9 +132,9 @@ function SideDrawer({
       <Drawer.Screen
         name="Time Record Approvals"
         options={{
-          drawerIcon: ({color}) => (
+          drawerIcon: ({ color }) => (
             <FontAwesomeIcon icon="clipboard-check" color={color} />
-          ),
+          )
         }}>
         {() => (
           <ApprovalScreen />
@@ -142,16 +143,26 @@ function SideDrawer({
       <Drawer.Screen
         name="Settings"
         options={{
-          drawerIcon: ({color}) => (
+          drawerIcon: ({ color }) => (
             <FontAwesomeIcon icon="gear" color={color} />
-          ),
+          )
         }}>
         {() => (
           <SettingsScreen isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
         )}
       </Drawer.Screen>
-    </Drawer.Navigator>
-  );
+    <Drawer.Screen
+        name="User Management"
+        component={UserManagement}
+        options={{
+          drawerIcon: ({ color }) => (
+                <FontAwesomeIcon icon="user" color={color} />
+          )
+        }}
+    />
+
+</Drawer.Navigator>
+  )
 }
 
-export default SideDrawer;
+export default SideDrawer

@@ -1,22 +1,20 @@
-// Manage Users!
-//  View Users - In a List
-//  Add users
-//  Edit Users/Update
-//  Delete users
-//
 import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, Button, Alert } from 'react-native'
-import { useAPIClient } from '../api/APIClientContext';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { useAPIClient } from '../api/APIClientContext'
+import { useTheme } from '../theme/Colors'
 import UserAPI from '../api/UserAPI'
 import type User from '../models/User'
+import UserItem from '../components/user/user'
+import UserFilter from '../components/user/user-filter';
 
 const UserManagement: React.FC = () => {
-  // State for managing users
+  const {colors} = useTheme();
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState<boolean>(false)
 
-  const { apiClient } = useAPIClient();
-  const userAPI = new UserAPI(apiClient);
+  const { apiClient } = useAPIClient()
+  const userAPI = new UserAPI(apiClient)
 
   useEffect(() => {
     // Fetch users when component mounts
@@ -39,61 +37,80 @@ const UserManagement: React.FC = () => {
 
   // Function to handle user deletion
   const handleDeleteUser = async (userId: string) => {
-    // Display confirmation dialog
-    Alert.alert(
-      'Confirm Deletion',
-      'Are you sure you want to delete this user?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel'
-        },
-        {
-          text: 'Delete',
-          onPress: async () => {
-            // Call API to delete user
-            try {
-              await userAPI.deleteUser(userId)
-              // Refetch users after deletion
-              fetchUsers()
-            } catch (error) {
-              console.error('Error deleting user:', error)
-              // Handle error
-            }
-          }
-        }
-      ],
-      { cancelable: false }
+    // Implement deletion logic
+  }
+
+  // Render user item
+  const renderUserItem = ({ item }: { item: User }) => {
+    return (
+        <UserItem user={item} refreshList={fetchUsers} />
     )
   }
 
   return (
-        <View style={{ flex: 1, padding: 20 }}>
-            {/* User list */}
-            {loading
-              ? (
-                <Text>Loading...</Text>
-                )
-              : (
-                <FlatList
-                    data={users}
-                    renderItem={({ item }) => (
-                        <View style={{ marginBottom: 10, flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={{ flex: 1 }}>
-                                <Text>{item.firstName} {item.lastName}</Text>
-                            </View>
-                            <Button title="Edit" onPress={() => { console.log('Edit user button pressed') }} />
-                            <Button title="Delete" onPress={async () => { await handleDeleteUser(item._id) }} />
-                        </View>
-                    )}
-                    keyExtractor={(item) => item._id}
-                />
-                )}
+      <View style={{ flex: 1, position: 'relative' }}>
+        {/* Buttons Container */}
+        <View style={styles.buttonsContainer}>
+          {/* Add User Button */}
+          <TouchableOpacity style={styles.addButton}>
+            <FontAwesomeIcon icon='plus' size={24} color="white" />
+          </TouchableOpacity>
 
-            {/* Add User Button */}
-            <Button title="Add User" onPress={() => { console.log('Add user button pressed') }} />
+          {/* Settings Button */}
+          <TouchableOpacity style={styles.settingsButton}>
+            <FontAwesomeIcon icon='sliders' size={26} color={colors.opText}/>
+          </TouchableOpacity>
         </View>
+
+        {/* User list */}
+        <FlatList
+            data={users}
+            renderItem={renderUserItem}
+            keyExtractor={(item) => item._id}
+            ListEmptyComponent={<Text>No users found.</Text>}
+            contentContainerStyle={styles.userList}
+        />
+      </View>
+
   )
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey'
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  addButton: {
+    backgroundColor: 'blue',
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsButton: {
+    padding: 10
+  },
+  userList: {
+    paddingBottom: 20, // Adjust the paddingBottom as needed
+  }
+})
 
 export default UserManagement
